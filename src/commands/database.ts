@@ -152,23 +152,24 @@ interface RemoveResponse {
   workflowId: string;
 }
 
-export function createDbCommand() {
-  const db = new Command('db')
+export function createDatabaseCommand() {
+  const database = new Command('database')
     .description('Manage Parix databases')
     .addHelpText(
       'after',
       [
         '',
         'Examples:',
-        '  parix db catalog --base-url http://localhost:5173',
-        '  parix db create demo-ledger --provider gcp --region asia-southeast1',
-        '  parix db list',
-        '  parix db info id-123',
-        '  parix db remove id-123 --yes',
+        '  parix database catalog --base-url http://localhost:5173',
+        '  parix database create demo-ledger --provider gcp --region asia-southeast1',
+        '  parix database list',
+        '  parix database info id-123',
+        '  parix database remove id-123 --yes',
       ].join('\n'),
     );
 
-  db.command('catalog')
+  database
+    .command('catalog')
     .description('Show database creation catalog options')
     .option('-b, --base-url <url>', 'Parix base URL')
     .option('--json', 'Print raw JSON')
@@ -214,7 +215,8 @@ export function createDbCommand() {
       outro('Done');
     });
 
-  db.command('create')
+  database
+    .command('create')
     .description('Create a new database')
     .argument('<database>', 'Database name')
     .option('-b, --base-url <url>', 'Parix base URL')
@@ -230,8 +232,8 @@ export function createDbCommand() {
       [
         '',
         'Examples:',
-        '  parix db create payments-ledger --provider gcp --region asia-southeast1',
-        '  parix db create payments-ledger --provider aws --region ap-southeast-1 --cluster-config-id config-single --cluster-size-id size-hx-5',
+        '  parix database create payments-ledger --provider gcp --region asia-southeast1',
+        '  parix database create payments-ledger --provider aws --region ap-southeast-1 --cluster-config-id config-single --cluster-size-id size-hx-5',
       ].join('\n'),
     )
     .action(async (databaseName: string, options: CreateOptions) => {
@@ -295,7 +297,8 @@ export function createDbCommand() {
       outro(response.message);
     });
 
-  db.command('list')
+  database
+    .command('list')
     .description('List databases in the active organization')
     .option('-b, --base-url <url>', 'Parix base URL')
     .option('--search <text>', 'Filter database names')
@@ -303,7 +306,13 @@ export function createDbCommand() {
     .option('--json', 'Print raw JSON')
     .addHelpText(
       'after',
-      ['', 'Examples:', '  parix db list', '  parix db list --search payments', '  parix db list --json'].join('\n'),
+      [
+        '',
+        'Examples:',
+        '  parix database list',
+        '  parix database list --search payments',
+        '  parix database list --json',
+      ].join('\n'),
     )
     .action(async (options: ListOptions) => {
       const query = new URLSearchParams();
@@ -345,12 +354,16 @@ export function createDbCommand() {
       outro('Done');
     });
 
-  db.command('info')
+  database
+    .command('info')
     .description('Show database details')
     .argument('<database-id>', 'Database id')
     .option('-b, --base-url <url>', 'Parix base URL')
     .option('--json', 'Print raw JSON')
-    .addHelpText('after', ['', 'Examples:', '  parix db info db_123', '  parix db info db_123 --json'].join('\n'))
+    .addHelpText(
+      'after',
+      ['', 'Examples:', '  parix database info db_123', '  parix database info db_123 --json'].join('\n'),
+    )
     .action(async (databaseId: string, options: BaseOptions) => {
       const response = await requestApiJson<DatabaseInfoResponse>({
         baseUrl: options.baseUrl,
@@ -404,7 +417,8 @@ export function createDbCommand() {
       outro('Done');
     });
 
-  db.command('remove')
+  database
+    .command('remove')
     .description('Queue database deletion')
     .argument('<database-id>', 'Database id')
     .option('-b, --base-url <url>', 'Parix base URL')
@@ -412,7 +426,7 @@ export function createDbCommand() {
     .option('-y, --yes', 'Skip confirmation prompt')
     .addHelpText(
       'after',
-      ['', 'Examples:', '  parix db remove db_123', '  parix db remove db_123 --yes --json'].join('\n'),
+      ['', 'Examples:', '  parix database remove db_123', '  parix database remove db_123 --yes --json'].join('\n'),
     )
     .action(async (databaseId: string, options: RemoveOptions) => {
       if (!options.yes) {
@@ -444,5 +458,5 @@ export function createDbCommand() {
       outro(response.message);
     });
 
-  return db;
+  return database;
 }

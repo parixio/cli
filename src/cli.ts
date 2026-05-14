@@ -4,7 +4,7 @@ import { log } from '@clack/prompts';
 import { Command } from 'commander';
 import { createApiCommand } from './commands/api';
 import { createAuthCommand } from './commands/auth';
-import { createDbCommand } from './commands/db';
+import { createDatabaseCommand } from './commands/database';
 import { createTbCommand } from './commands/tb';
 
 async function main() {
@@ -16,7 +16,7 @@ async function main() {
     .showHelpAfterError()
     .addCommand(createAuthCommand())
     .addCommand(createApiCommand())
-    .addCommand(createDbCommand())
+    .addCommand(createDatabaseCommand())
     .addCommand(createTbCommand());
 
   await program.parseAsync(process.argv);
