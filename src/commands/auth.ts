@@ -62,7 +62,7 @@ async function handleLogin(options: LoginOptions) {
   intro('Parix sign in');
 
   const storedSession = await readStoredSession();
-  const baseUrl = resolveBaseUrl(options.baseUrl, storedSession);
+  const baseUrl = resolveBaseUrl(options.baseUrl, storedSession, { useStoredSession: false });
   const loopbackServer = await startLoopbackServer({
     callbackPath: PARIX_LOCAL_CALLBACK_PATH,
     port: options.port,
