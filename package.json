@@ -2,9 +2,9 @@
   "name": "@parix/parix",
   "description": "Parix command line interface",
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "bin": {
-    "parix": "./dist/cli.cjs"
+    "parix": "dist/cli.cjs"
   },
   "files": [
     "dist"
@@ -29,12 +29,12 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "zshy",
-    "build:link": "zshy && bun link",
-    "fmt": "oxfmt --write src test package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
-    "fmt:check": "oxfmt --check src test package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
-    "lint": "oxlint src test",
-    "lint:fix": "oxlint --fix src test",
+    "build": "zshy && node scripts/normalize-package-bin.mjs && chmod +x dist/cli.cjs",
+    "build:link": "bun run build && bun link",
+    "fmt": "oxfmt --write src test scripts package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
+    "fmt:check": "oxfmt --check src test scripts package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
+    "lint": "oxlint src test scripts",
+    "lint:fix": "oxlint --fix src test scripts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "cli": "node ./dist/cli.cjs",
@@ -68,7 +68,7 @@
       "oxfmt --write"
     ],
     "*.{js,ts}": [
-      "oxlint --fix src test"
+      "oxlint --fix src test scripts"
     ]
   }
 }
