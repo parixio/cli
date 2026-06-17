@@ -2,10 +2,10 @@ import { Buffer } from 'node:buffer';
 import { createHash, randomBytes } from 'node:crypto';
 import { trimTrailingSlash } from './config';
 
-export const HYPERTX_CLIENT_ID = 'parix';
-export const HYPERTX_LOCAL_CALLBACK_PATH = '/callback';
+export const PARIX_CLIENT_ID = 'parix';
+export const PARIX_LOCAL_CALLBACK_PATH = '/callback';
 export const CLI_OAUTH_CONSENT_GRANTED_PATH = '/cli-oauth-consent-granted';
-export const HYPERTX_DEFAULT_SCOPES = [
+export const PARIX_DEFAULT_SCOPES = [
   'openid',
   'profile',
   'email',

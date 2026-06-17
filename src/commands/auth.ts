@@ -7,7 +7,7 @@ import {
   buildCliState,
   CLI_OAUTH_CONSENT_GRANTED_PATH,
   createPkcePair,
-  HYPERTX_LOCAL_CALLBACK_PATH,
+  PARIX_LOCAL_CALLBACK_PATH,
 } from '../lib/oauth';
 import { exchangeAuthorizationCode, fetchOAuthUserInfo } from '../lib/oauth-api';
 import { createStoredSession, ensureFreshSession, hydrateStoredSessionOrganization } from '../lib/oauth-session';
@@ -64,7 +64,7 @@ async function handleLogin(options: LoginOptions) {
   const storedSession = await readStoredSession();
   const baseUrl = resolveBaseUrl(options.baseUrl, storedSession);
   const loopbackServer = await startLoopbackServer({
-    callbackPath: HYPERTX_LOCAL_CALLBACK_PATH,
+    callbackPath: PARIX_LOCAL_CALLBACK_PATH,
     port: options.port,
     successPage: {
       redirectUrl: new URL(CLI_OAUTH_CONSENT_GRANTED_PATH, baseUrl).toString(),

@@ -95,7 +95,8 @@ bun run cli -- tb query-accounts <database-id> --limit 10 --json
 bun run cli -- tb create-transfers <database-id> --from 1000 --to 1001 --amount 1 --ledger 1 --code 1
 ```
 
-You can override the target app URL with `--base-url` or `HTX_BASE_URL`.
+By default, the CLI targets `https://parix.io`. You can override the target app URL with `--base-url`
+or `PARIX_BASE_URL`.
 
 ## Publishing
 

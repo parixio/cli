@@ -1,4 +1,4 @@
-import { buildOAuthCallbackUrl, buildOAuthTokenUrl, buildOAuthUserInfoUrl, HYPERTX_CLIENT_ID } from './oauth';
+import { buildOAuthCallbackUrl, buildOAuthTokenUrl, buildOAuthUserInfoUrl, PARIX_CLIENT_ID } from './oauth';
 
 const WHITESPACE_REGEX = /\s+/;
 
@@ -24,7 +24,7 @@ export interface OAuthUserInfo {
 
 export async function exchangeAuthorizationCode(input: { baseUrl: string; code: string; codeVerifier: string }) {
   const body = new URLSearchParams({
-    client_id: HYPERTX_CLIENT_ID,
+    client_id: PARIX_CLIENT_ID,
     code: input.code,
     code_verifier: input.codeVerifier,
     grant_type: 'authorization_code',
@@ -44,7 +44,7 @@ export async function exchangeAuthorizationCode(input: { baseUrl: string; code: 
 
 export async function refreshOAuthTokens(input: { baseUrl: string; refreshToken: string }) {
   const body = new URLSearchParams({
-    client_id: HYPERTX_CLIENT_ID,
+    client_id: PARIX_CLIENT_ID,
     grant_type: 'refresh_token',
     refresh_token: input.refreshToken,
   });

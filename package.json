@@ -2,8 +2,10 @@
   "name": "@parix/parix",
   "description": "Parix command line interface",
   "type": "module",
-  "version": "0.1.2",
-  "bin": "./dist/cli.cjs",
+  "version": "0.1.3",
+  "bin": {
+    "parix": "./dist/cli.cjs"
+  },
   "files": [
     "dist"
   ],
@@ -43,7 +45,9 @@
     "prepare": "husky"
   },
   "zshy": {
-    "bin": "./src/cli.ts"
+    "bin": {
+      "parix": "./src/cli.ts"
+    }
   },
   "dependencies": {
     "@clack/prompts": "^0.8.2",
