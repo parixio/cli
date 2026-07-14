@@ -1,5 +1,5 @@
 {
-  "name": "@parix/parix",
+  "name": "@parix/cli",
   "description": "Parix command line interface",
   "type": "module",
   "version": "0.1.5",
@@ -21,9 +21,9 @@
   "keywords": [
     "parix",
     "cli",
-    "parix",
     "database",
-    "tigerbeetle"
+    "tigerbeetle",
+    "oauth"
   ],
   "engines": {
     "node": ">=20"

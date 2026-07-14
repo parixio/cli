@@ -16,6 +16,11 @@ function outputText(result: ReturnType<typeof runCli>) {
 }
 
 describe('CLI command surface', () => {
+  test('packages as @parix/cli with a parix binary', () => {
+    expect(packageJson.name).toBe('@parix/cli');
+    expect(packageJson.bin).toEqual({ parix: 'dist/cli.cjs' });
+  });
+
   test('prints the package version with -v', () => {
     const versionResult = runCli(['-v']);
 

@@ -1,25 +1,48 @@
-# parix
+# @parix/cli
 
-`parix` is the Parix command line interface.
+The Parix command line interface. Install the npm package `@parix/cli`; the executable command is `parix`.
 
 ## Install
 
 ```bash
-npm install -g @parix/parix
+npm install -g @parix/cli
 parix --help
 ```
 
-Current commands:
+Requirements: Node.js 20 or later.
+
+### Migrating from `@parix/parix`
+
+The package was renamed from `@parix/parix` to `@parix/cli`. The command name is unchanged:
+
+```bash
+npm uninstall -g @parix/parix
+npm install -g @parix/cli
+parix --help
+```
+
+## Commands
+
+Auth:
 
 - `parix auth login`
 - `parix auth status`
 - `parix auth logout`
+
+API:
+
 - `parix api <path>`
+
+Database:
+
 - `parix database catalog`
 - `parix database create <database>`
 - `parix database list`
 - `parix database info <database-id>`
 - `parix database remove <database-id>`
+
+TigerBeetle:
+
 - `parix tb create-accounts <database-id>`
 - `parix tb create-transfers <database-id>`
 - `parix tb lookup-accounts <database-id>`
@@ -98,26 +121,35 @@ bun run cli -- tb create-transfers <database-id> --from 1000 --to 1001 --amount 
 By default, the CLI targets `https://parix.io`. You can override the target app URL with `--base-url`
 or `PARIX_BASE_URL`.
 
+For a global install from a local checkout:
+
+```bash
+bun run build:link
+parix --help
+```
+
 ## Publishing
+
+Package name on npm: **`@parix/cli`** (public scoped package). Binary: **`parix`**.
 
 ```bash
 bun run publish:check
 bun run publish:npm
 ```
 
-`publish:check` runs formatting, linting, tests, type checking, a fresh build, and `npm pack --dry-run` using a repo-local npm cache directory. `publish:npm` publishes the package publicly to npmjs.com using that same local cache.
+`publish:check` runs formatting, linting, tests, type checking, a fresh build, and `npm pack --dry-run` using a repo-local npm cache directory. `publish:npm` publishes `@parix/cli` publicly to npmjs.com using that same local cache.
 
 ## GitHub Actions
 
 - `.github/workflows/ci.yml` runs lint, tests, typecheck, build, and `npm pack --dry-run` on pushes and pull requests
-- `.github/workflows/publish.yml` publishes to npm when a GitHub Release is published, using the `NPM_ACCESS_TOKEN` secret, and uploads the published npm tarball to the GitHub Release
+- `.github/workflows/publish.yml` publishes `@parix/cli` to npm when a GitHub Release is published, using the `NPM_ACCESS_TOKEN` secret, and uploads the published npm tarball to the GitHub Release
 
 Recommended release flow:
 
 ```bash
 # bump version in package.json
-git tag v0.1.2
+git tag v0.1.5
 git push origin main --tags
 ```
 
-Then publish a GitHub Release from tag `v0.1.2`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball, publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.
+Then publish a GitHub Release from tag `v0.1.5`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball (`parix-cli-<version>.tgz`), publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.
