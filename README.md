@@ -148,8 +148,8 @@ Recommended release flow:
 
 ```bash
 # bump version in package.json
-git tag v0.1.5
+git tag v0.1.6
 git push origin main --tags
 ```
 
-Then publish a GitHub Release from tag `v0.1.5`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball (`parix-cli-<version>.tgz`), publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.
+Then publish a GitHub Release from tag `v0.1.6`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball (`parix-cli-<version>.tgz`), publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.
