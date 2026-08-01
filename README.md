@@ -23,6 +23,10 @@ parix --help
 
 ## Commands
 
+Agent skill:
+
+- `parix skill`: print the embedded Parix agent skill as raw Markdown
+
 Auth:
 
 - `parix auth login`
@@ -90,7 +94,7 @@ Supported operations:
 
 TigerBeetle commands support both styles:
 
-- flag-driven payloads for common workflows such as `--from`, `--to`, `--amount`, `--ledger`, `--code`, repeated `--id`, and repeated `--flag`
+- flag-driven payloads for common workflows such as `--from`, `--to`, `--amount`, `--ledger`, `--code`, `--timestamp`, `--user-data-128`, `--user-data-64`, `--user-data-32`, repeated `--id`, and repeated `--flag`
 - raw JSON overrides with `--payload '<json>'` or `--file ./payload.json`
 
 Operational notes:
@@ -98,6 +102,10 @@ Operational notes:
 - database and TB commands use the active organization from the current `parix` token
 - `db:read` and `db:write` OIDC scopes are enforced on the Worker API surface
 - newly provisioned databases may take a short time to become ready for TB operations; the CLI/API includes readiness retries for fresh databases
+- `--timestamp` is required with the `imported` account or transfer flag, is expressed in nanoseconds, and must be greater than 0 and less than 2^63
+- transfer `--timeout` values are expressed in seconds
+- post-pending transfers require `--pending-id` and `--amount`; void-pending transfers require `--pending-id`; omitted account IDs, ledger, code, and void amount are sent as zero to inherit them
+- linked account or transfer batches must use `--payload` or `--file`
 
 ## Development
 
@@ -148,8 +156,8 @@ Recommended release flow:
 
 ```bash
 # bump version in package.json
-git tag v0.1.6
+git tag v0.1.7
 git push origin main --tags
 ```
 
-Then publish a GitHub Release from tag `v0.1.6`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball (`parix-cli-<version>.tgz`), publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.
+Then publish a GitHub Release from tag `v0.1.7`. The publish workflow verifies that the release tag matches `package.json`, packs the npm tarball (`parix-cli-<version>.tgz`), publishes that tarball to npm, and uploads the same `.tgz` as a GitHub Release asset.

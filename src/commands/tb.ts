@@ -22,6 +22,7 @@ interface CreateAccountsOptions extends BaseTbOptions {
   flag?: string[];
   id?: string;
   ledger?: string;
+  timestamp?: string;
   userData128?: string;
   userData32?: string;
   userData64?: string;
@@ -35,8 +36,12 @@ interface CreateTransfersOptions extends BaseTbOptions {
   id?: string;
   ledger?: string;
   pendingId?: string;
+  timestamp?: string;
   timeout?: string;
   to?: string;
+  userData128?: string;
+  userData32?: string;
+  userData64?: string;
 }
 
 interface LookupOptions extends BaseTbOptions {
@@ -127,6 +132,7 @@ function addCreateAccountsCommand(parent: Command) {
     .option('--ledger <ledger>', 'Ledger id')
     .option('--code <code>', 'Account code')
     .option('--flag <flag>', 'Account flag name or bitfield value', collectValues, [])
+    .option('--timestamp <nanoseconds>', 'Imported timestamp, greater than 0 and less than 2^63')
     .option('--user-data-128 <value>', 'user_data_128')
     .option('--user-data-64 <value>', 'user_data_64')
     .option('--user-data-32 <value>', 'user_data_32')
@@ -146,6 +152,7 @@ function addCreateAccountsCommand(parent: Command) {
           flags: options.flag,
           id: options.id,
           ledger: options.ledger,
+          timestamp: options.timestamp,
           userData128: options.userData128,
           userData32: options.userData32,
           userData64: options.userData64,
@@ -172,13 +179,19 @@ function addCreateTransfersCommand(parent: Command) {
     .option('--code <code>', 'Transfer code')
     .option('--flag <flag>', 'Transfer flag name or bitfield value', collectValues, [])
     .option('--pending-id <id>', 'Pending transfer id')
-    .option('--timeout <ms>', 'Timeout value')
+    .option('--timeout <seconds>', 'Pending transfer timeout in seconds')
+    .option('--timestamp <nanoseconds>', 'Imported timestamp, greater than 0 and less than 2^63')
+    .option('--user-data-128 <value>', 'user_data_128')
+    .option('--user-data-64 <value>', 'user_data_64')
+    .option('--user-data-32 <value>', 'user_data_32')
     .addHelpText(
       'after',
       [
         '',
         'Examples:',
         '  parix tb create-transfers db_123 --id 2000 --from 1000 --to 1001 --amount 1 --ledger 1 --code 1',
+        '  parix tb create-transfers db_123 --id 2001 --pending-id 2000 --amount 25 --flag post_pending_transfer',
+        '  parix tb create-transfers db_123 --id 2001 --pending-id 2000 --flag void_pending_transfer',
         '  parix tb create-transfers db_123 --file ./transfer.json',
       ].join('\n'),
     )
@@ -193,7 +206,11 @@ function addCreateTransfersCommand(parent: Command) {
           id: options.id,
           ledger: options.ledger,
           pendingId: options.pendingId,
+          timestamp: options.timestamp,
           timeout: options.timeout,
+          userData128: options.userData128,
+          userData32: options.userData32,
+          userData64: options.userData64,
         }),
       );
       await executeTbOperation(databaseId, 'create_transfers', payload, options);

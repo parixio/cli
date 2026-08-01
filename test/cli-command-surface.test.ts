@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import packageJson from '../package.json';
+import { PARIX_AGENT_SKILL } from '../src/commands/skill-content';
 
 const cliArgs = [process.execPath, 'src/cli.ts'];
 
@@ -39,5 +40,32 @@ describe('CLI command surface', () => {
 
     expect(dbCommand.exitCode).not.toBe(0);
     expect(outputText(dbCommand)).toContain("unknown command 'db'");
+  });
+
+  test('prints the embedded agent skill as raw Markdown', () => {
+    const skillResult = runCli(['skill']);
+
+    expect(skillResult.exitCode).toBe(0);
+    expect(skillResult.stderr.toString()).toBe('');
+    expect(skillResult.stdout.toString()).toBe(PARIX_AGENT_SKILL);
+    expect(skillResult.stdout.toString()).toStartWith('---\nname: parix\n');
+    expect(skillResult.stdout.toString()).toContain('\n# Parix CLI\n');
+    expect(skillResult.stdout.toString()).toContain('Never read or print `~/.config/parix/session.json`');
+    expect(skillResult.stdout.toString()).toContain('`--timestamp` in nanoseconds');
+    expect(skillResult.stdout.toString()).toContain('`--timeout` values are in seconds');
+    expect(skillResult.stdout.toString()).toEndWith('\n');
+  });
+
+  test('registers skill with the expected help description', () => {
+    const rootHelp = runCli(['--help']);
+    const skillHelp = runCli(['skill', '--help']);
+
+    expect(rootHelp.exitCode).toBe(0);
+    expect(rootHelp.stdout.toString()).toMatch(/^\s+skill\s+Print the agent skill file to stdout$/m);
+    expect(skillHelp.exitCode).toBe(0);
+    expect(skillHelp.stderr.toString()).toBe('');
+    expect(skillHelp.stdout.toString()).toContain('Usage: parix skill [options]');
+    expect(skillHelp.stdout.toString()).toContain('Print the agent skill file to stdout');
+    expect(skillHelp.stdout.toString()).not.toContain('# Parix CLI');
   });
 });

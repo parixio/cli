@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { createApiCommand } from './commands/api';
 import { createAuthCommand } from './commands/auth';
 import { createDatabaseCommand } from './commands/database';
+import { createSkillCommand } from './commands/skill';
 import { createTbCommand } from './commands/tb';
 
 const loadPackageJson = createRequire(import.meta.url);
@@ -22,6 +23,7 @@ async function main() {
     .addCommand(createAuthCommand())
     .addCommand(createApiCommand())
     .addCommand(createDatabaseCommand())
+    .addCommand(createSkillCommand())
     .addCommand(createTbCommand());
 
   await program.parseAsync(process.argv);
