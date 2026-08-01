@@ -38,11 +38,26 @@ export async function requestApiJson<T>(input: {
   const payload = raw.length > 0 ? safeParseJson(raw) : null;
 
   if (!response.ok) {
-    const message = getApiErrorMessage(payload) ?? (raw.trim() || `${response.status} ${response.statusText}`);
-    throw new Error(message);
+    const message =
+      getApiErrorMessage(payload) ??
+      (typeof raw === 'string' && raw.trim().length > 0 ? raw.trim() : null) ??
+      `${response.status} ${response.statusText}`;
+    throw new ApiRequestError(message, response.status, payload);
   }
 
   return payload as T;
+}
+
+export class ApiRequestError extends Error {
+  readonly status: number;
+  readonly payload: unknown;
+
+  constructor(message: string, status: number, payload: unknown) {
+    super(message);
+    this.name = 'ApiRequestError';
+    this.status = status;
+    this.payload = payload;
+  }
 }
 
 function safeParseJson(value: string) {
@@ -59,17 +74,32 @@ function getApiErrorMessage(payload: unknown) {
   }
 
   const row = payload as {
+    detail?: unknown;
     error?: unknown;
     message?: unknown;
+    title?: unknown;
+    tbResults?: unknown;
   };
 
-  if (typeof row.message === 'string' && row.message.trim().length > 0) {
-    return row.message;
+  const parts: string[] = [];
+
+  if (typeof row.detail === 'string' && row.detail.trim().length > 0) {
+    parts.push(row.detail.trim());
+  } else if (typeof row.message === 'string' && row.message.trim().length > 0) {
+    parts.push(row.message.trim());
+  } else if (typeof row.error === 'string' && row.error.trim().length > 0) {
+    parts.push(row.error.trim());
+  } else if (typeof row.title === 'string' && row.title.trim().length > 0) {
+    parts.push(row.title.trim());
   }
 
-  if (typeof row.error === 'string' && row.error.trim().length > 0) {
-    return row.error;
+  if (Array.isArray(row.tbResults) && row.tbResults.length > 0) {
+    parts.push(`tbResults: ${JSON.stringify(row.tbResults)}`);
   }
 
-  return null;
+  if (parts.length === 0) {
+    return null;
+  }
+
+  return parts.join(' — ');
 }

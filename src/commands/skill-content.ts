@@ -65,7 +65,7 @@ export const PARIX_AGENT_SKILL = [
   '',
   "Prefer relative `/api/...` paths. An absolute HTTP(S) URL also receives the stored bearer token, so use one only when the user explicitly trusts that host. Repeat `-H 'name:value'` for headers; a body defaults to `content-type: application/json` unless overridden.",
   '',
-  'Always inspect the printed HTTP status: `parix api` can exit successfully for an HTTP error response.',
+  'Always inspect the printed HTTP status. `parix api` and `parix tb` set a non-zero exit code on HTTP 4xx/5xx; still read the body for `detail` and `tbResults`.',
   '',
   '## Verify outcomes',
   '',

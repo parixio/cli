@@ -59,13 +59,17 @@ async function handleApiRequest(requestPath: string, options: ApiRequestOptions)
   if (contentType.includes('application/json') && payload.length > 0) {
     try {
       log.message(JSON.stringify(JSON.parse(payload), null, 2));
-      outro('Request completed');
-      return;
-    } catch {}
+    } catch {
+      log.message(payload);
+    }
+  } else if (payload.length > 0) {
+    log.message(payload);
   }
 
-  if (payload.length > 0) {
-    log.message(payload);
+  if (!response.ok) {
+    process.exitCode = 1;
+    outro(`Request failed with HTTP ${response.status}`);
+    return;
   }
 
   outro('Request completed');
