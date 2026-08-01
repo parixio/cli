@@ -29,7 +29,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "zshy && node scripts/normalize-package-bin.mjs && chmod +x dist/cli.cjs",
+    "build": "bun build ./src/cli.ts --outfile=dist/cli.cjs --target=node --format=cjs && node scripts/normalize-package-bin.mjs && node scripts/ensure-cli-shebang.mjs && chmod +x dist/cli.cjs",
     "build:link": "bun run build && bun link",
     "fmt": "oxfmt --write src test scripts package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
     "fmt:check": "oxfmt --check src test scripts package.json tsconfig.json .oxlintrc.json .oxfmtrc.json commitlint.config.js",
