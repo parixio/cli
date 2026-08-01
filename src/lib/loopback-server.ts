@@ -69,6 +69,9 @@ export async function startLoopbackServer(options: StartLoopbackServerOptions): 
   });
 
   server.on('request', (request, response) => {
+    // One-shot OAuth loopback: do not keep browser sockets alive after the response.
+    response.setHeader('connection', 'close');
+
     const requestUrl = new URL(request.url ?? '/', 'http://127.0.0.1');
 
     if (requestUrl.pathname === '/favicon.ico') {
@@ -166,17 +169,40 @@ function listen(server: Server, port: number) {
 
 function closeServer(server: Server) {
   return new Promise<void>((resolve, reject) => {
-    server.close((error) => {
+    let settled = false;
+    const finish = (error?: Error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
       if (error) {
-        if ('code' in error && error.code === 'ERR_SERVER_NOT_RUNNING') {
-          resolve();
-          return;
-        }
         reject(error);
         return;
       }
       resolve();
+    };
+
+    server.close((error) => {
+      if (error) {
+        if ('code' in error && error.code === 'ERR_SERVER_NOT_RUNNING') {
+          finish();
+          return;
+        }
+        finish(error);
+        return;
+      }
+      finish();
     });
+
+    // `server.close()` waits for existing connections. Browsers often keep the
+    // loopback socket open via HTTP keep-alive, which would hang login forever
+    // after the session is already stored. Force those sockets closed (Node >= 18.2).
+    server.closeAllConnections();
+
+    // Last resort: never let close block the CLI indefinitely.
+    setTimeout(() => {
+      finish();
+    }, 250).unref();
   });
 }
 

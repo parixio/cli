@@ -29,8 +29,14 @@ async function main() {
   await program.parseAsync(process.argv);
 }
 
-main().catch((error) => {
-  const message = error instanceof Error ? error.message : String(error);
-  log.error(message);
-  process.exitCode = 1;
-});
+main()
+  .then(() => {
+    // CLIs that open HTTP servers / use undici fetch can leave sockets that keep
+    // Node alive after the command is done. Exit explicitly once work is finished.
+    process.exit(process.exitCode ?? 0);
+  })
+  .catch((error) => {
+    const message = error instanceof Error ? error.message : String(error);
+    log.error(message);
+    process.exit(1);
+  });

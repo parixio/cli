@@ -98,6 +98,10 @@ async function handleLogin(options: LoginOptions) {
     const callbackResult = await loopbackServer.waitForResult();
     waitSpinner.stop('Received browser callback');
 
+    // Shut down the loopback server before token exchange so browser keep-alive
+    // sockets cannot keep the process open after sign-in completes.
+    await loopbackServer.close().catch(() => {});
+
     const tokenSet = await exchangeAuthorizationCode({
       baseUrl,
       code: callbackResult.code,
