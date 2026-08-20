@@ -129,6 +129,11 @@ bun run cli -- tb create-transfers <database-id> --from 1000 --to 1001 --amount 
 By default, the CLI targets `https://parix.io`. You can override the target app URL with `--base-url`
 or `PARIX_BASE_URL`.
 
+First users on the technical preview should log in once with
+`parix auth login --base-url https://dev.parix.io`. Then `parix auth status` should show
+`Base URL: https://dev.parix.io`. Later commands use the stored session. Optionally,
+`export PARIX_BASE_URL=https://dev.parix.io`.
+
 For a global install from a local checkout:
 
 ```bash

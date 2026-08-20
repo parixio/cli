@@ -12,7 +12,7 @@ export const PARIX_AGENT_SKILL = [
   '',
   '1. Run `command -v parix`. If it is absent, ask the user to install it with `npm install -g @parix/cli`.',
   '2. Run `parix auth status` before authenticated work. Confirm the base URL and active organization before any mutation. Status may refresh and persist tokens or organization context, so it is not strictly read-only. If no usable session exists, ask the user to complete `parix auth login`; login opens a browser OAuth flow.',
-  '3. Treat `https://parix.io` as production. Login resolves its target as explicit `--base-url`, then `PARIX_BASE_URL`, then production; it ignores any URL in the stored session. Later commands resolve explicit URL, then stored URL, then environment, then production. Pass `--base-url <url>` explicitly when the environment matters.',
+  '3. Treat `https://parix.io` as production. Login resolves its target as explicit `--base-url`, then `PARIX_BASE_URL`, then production; it ignores any URL in the stored session. Later commands resolve explicit URL, then stored URL, then environment, then production. Pass `--base-url <url>` explicitly when the environment matters. For the technical preview, log in once with `parix auth login --base-url https://dev.parix.io`; `parix auth status` should then show `Base URL: https://dev.parix.io`, and later commands use the stored session. Optionally, `export PARIX_BASE_URL=https://dev.parix.io`.',
   '4. Use `parix database`, not `parix db`; no `db` alias exists.',
   '',
   'Never read or print `~/.config/parix/session.json`; it contains access and refresh tokens.',
