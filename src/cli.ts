@@ -30,8 +30,7 @@ async function main() {
   await program.parseAsync(process.argv);
 }
 
-// Writes to a pipe are asynchronous on macOS, so wait for queued output (such as a large
-// `--json` payload) to drain before `process.exit` can cut it off.
+// Pipe writes are asynchronous on macOS; drain them so `process.exit` cannot truncate output.
 function flushStdout() {
   return new Promise<void>((resolve) => {
     process.stdout.write('', () => resolve());
@@ -48,7 +47,6 @@ main()
   .catch(async (error) => {
     const message = error instanceof Error ? error.message : String(error);
     if (isJsonOutputRequested()) {
-      // Keep stdout parseable for `--json`: report the failure on stderr only.
       process.stderr.write(`Error: ${message}\n`);
     } else {
       log.error(message);

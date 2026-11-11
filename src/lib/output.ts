@@ -1,17 +1,14 @@
 import { log } from '@clack/prompts';
 import process from 'node:process';
 
-/** Machine-readable output for `--json`: plain JSON on stdout, with no terminal decoration. */
 export function printJson(value: unknown) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
 }
 
-/** JSON shown inside the decorated human-readable output. */
 export function printJsonBlock(value: unknown) {
   log.message(JSON.stringify(value, null, 2));
 }
 
-/** True when the current invocation asked for machine-readable output. */
 export function isJsonOutputRequested(argv: readonly string[] = process.argv) {
   return argv.includes('--json');
 }

@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-// Large enough that a pipe write is still queued when the CLI exits unless stdout is flushed.
+// Large enough that the pipe write is still queued at exit unless stdout is flushed.
 const databases = Array.from({ length: 5_000 }, (_, index) => ({
   createdAt: '2026-11-01T00:00:00Z',
   id: `db_${index}`,
@@ -18,7 +18,6 @@ let server: ReturnType<typeof Bun.serve>;
 let home = '';
 
 beforeAll(() => {
-  // Test the bundled CLI under Node, as it is installed.
   const build = Bun.spawnSync({ cmd: ['bun', 'run', 'build'], stdout: 'ignore', stderr: 'pipe' });
   if (build.exitCode !== 0) {
     throw new Error(build.stderr.toString());
@@ -81,7 +80,6 @@ afterAll(() => {
   rmSync(home, { recursive: true, force: true });
 });
 
-// stdout is a pipe, as it is when output goes to `jq`.
 async function runCli(args: string[]) {
   const child = Bun.spawn({
     cmd: ['node', 'dist/cli.cjs', ...args],

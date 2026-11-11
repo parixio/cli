@@ -136,7 +136,6 @@ async function handleStatus(options: StatusOptions) {
   const baseUrl = resolveBaseUrl(options.baseUrl, storedSession);
 
   try {
-    // Refresh against the origin that issued the session; `--base-url` only selects where to validate it.
     const refreshedSession = await hydrateStoredSessionOrganization(await ensureFreshSession(storedSession));
     const userInfo = await fetchOAuthUserInfo({
       accessToken: refreshedSession.accessToken,

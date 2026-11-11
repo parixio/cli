@@ -138,7 +138,6 @@ interface DatabaseInfoResponse {
   } | null;
   provider: string | null;
   region: string | null;
-  /** Latest replica storage report, or null when none arrived in the last 5 minutes. */
   storageHealth: {
     diskUsagePct: number | null;
     machineId: string;

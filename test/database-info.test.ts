@@ -3,8 +3,6 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-// Body mirrors getDatabaseResponseSchema in the platform (apps/web/workers/routes/api/v1/get-database-route.ts):
-// no gateway URL, and storageHealth from the latest replica report.
 const databaseInfoBody = {
   database: {
     createdAt: '2026-11-01T00:00:00Z',

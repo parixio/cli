@@ -46,7 +46,6 @@ export async function readStoredSession(): Promise<StoredSession | null> {
   }
 }
 
-// The session holds access and refresh tokens, so only the owner may read it.
 const SESSION_DIRECTORY_MODE = 0o700;
 const SESSION_FILE_MODE = 0o600;
 
@@ -58,7 +57,7 @@ export async function writeStoredSession(session: StoredSession) {
     encoding: 'utf8',
     mode: SESSION_FILE_MODE,
   });
-  // `mode` only applies when the file is created; tighten files written by older releases too.
+  // `mode` only applies on creation, so also tighten files written by older releases.
   await chmod(SESSION_FILE_PATH, SESSION_FILE_MODE);
 }
 

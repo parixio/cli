@@ -13,7 +13,6 @@ describe('ApiRequestError', () => {
   });
 });
 
-// Bodies below mirror the platform's problem details (apps/web/workers/routes/api/utils.ts).
 describe('getApiErrorMessage', () => {
   it('names the fields that failed request validation', () => {
     expect(

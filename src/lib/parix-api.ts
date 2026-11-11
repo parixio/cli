@@ -66,10 +66,6 @@ function safeParseJson(value: string) {
   }
 }
 
-/**
- * Builds a one-line message from a Parix problem-details body: the detail, then which fields failed
- * validation (`fieldErrors` / `errors`), the machine-readable `code`, and TigerBeetle `tbResults`.
- */
 export function getApiErrorMessage(payload: unknown) {
   if (!payload || typeof payload !== 'object') {
     return null;

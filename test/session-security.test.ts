@@ -3,9 +3,6 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writ
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-// Runs the real CLI with an isolated HOME against two mock Parix origins:
-// `issuer` issued the stored session, `other` is only ever passed as a one-shot `--base-url`.
-
 interface MockOrigin {
   requests: string[];
   server: ReturnType<typeof Bun.serve>;
