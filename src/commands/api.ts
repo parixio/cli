@@ -39,10 +39,8 @@ async function handleApiRequest(requestPath: string, options: ApiRequestOptions)
   }
 
   const client = new ApiClient({
-    session: {
-      ...storedSession,
-      baseUrl,
-    },
+    baseUrl,
+    session: storedSession,
   });
 
   const response = await client.request(requestPath, {

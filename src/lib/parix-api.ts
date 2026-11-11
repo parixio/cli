@@ -12,10 +12,8 @@ export async function createApiClient(baseUrlOverride?: string) {
   return {
     baseUrl,
     client: new ApiClient({
-      session: {
-        ...storedSession,
-        baseUrl,
-      },
+      baseUrl,
+      session: storedSession,
     }),
   };
 }

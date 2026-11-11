@@ -4,29 +4,32 @@ import { ensureFreshSession } from './oauth-session';
 const TRAILING_SLASHES_REGEX = /\/+$/;
 
 interface ApiClientOptions {
+  /** Origin that relative request paths resolve against. Defaults to the session's own base URL. */
+  baseUrl?: string;
+  /** The stored session. Its `baseUrl` is the origin that issued the tokens. */
   session: StoredSession;
 }
 
 export class ApiClient {
+  private readonly requestBaseUrl: string;
   private session: StoredSession;
 
   constructor(options: ApiClientOptions) {
     this.session = options.session;
+    this.requestBaseUrl = options.baseUrl ?? options.session.baseUrl;
   }
 
   async request(pathname: string, init: RequestInit = {}) {
+    // Tokens are always refreshed against, and persisted with, the origin that issued them.
+    // A one-shot `--base-url` only changes where this request is sent.
     this.session = await ensureFreshSession(this.session);
 
-    const url = toRequestUrl(pathname, this.session.baseUrl);
-    const headers = new Headers(init.headers);
-    headers.set('authorization', `Bearer ${this.session.accessToken}`);
+    const url = toRequestUrl(pathname, this.requestBaseUrl);
+    const response = await this.send(url, init);
 
-    const response = await fetch(url, {
-      ...init,
-      headers,
-    });
-
-    if (response.status !== 401) {
+    // A 401 from another origin says nothing about whether the issuer's token is stale,
+    // so only force a refresh when the request went to the issuing origin.
+    if (response.status !== 401 || !sameOrigin(url, this.session.baseUrl)) {
       return response;
     }
 
@@ -35,12 +38,15 @@ export class ApiClient {
       accessTokenExpiresAt: new Date(0).toISOString(),
     });
 
-    const retryHeaders = new Headers(init.headers);
-    retryHeaders.set('authorization', `Bearer ${this.session.accessToken}`);
+    return this.send(url, init);
+  }
 
+  private send(url: string, init: RequestInit) {
+    const headers = new Headers(init.headers);
+    headers.set('authorization', `Bearer ${this.session.accessToken}`);
     return fetch(url, {
       ...init,
-      headers: retryHeaders,
+      headers,
     });
   }
 }
@@ -50,6 +56,10 @@ function toRequestUrl(pathname: string, baseUrl: string) {
     return pathname;
   }
   return new URL(pathname, `${trimTrailingSlash(baseUrl)}/`).toString();
+}
+
+function sameOrigin(left: string, right: string) {
+  return new URL(left).origin === new URL(right).origin;
 }
 
 function trimTrailingSlash(value: string) {
