@@ -1,7 +1,7 @@
 import type { PayloadOverrideOptions, TbOperationName } from '../lib/tb-payloads';
 import { note, outro } from '@clack/prompts';
 import { Command } from 'commander';
-import { printJson } from '../lib/output';
+import { printJson, printJsonBlock } from '../lib/output';
 import { requestApiJson } from '../lib/parix-api';
 import {
   buildAccountFilterPayload,
@@ -377,7 +377,7 @@ async function executeTbOperation(
     note(String(response.responsePayload.length), 'Rows returned');
   }
 
-  printJson(response.responsePayload);
+  printJsonBlock(response.responsePayload);
   outro(response.message);
 }
 
