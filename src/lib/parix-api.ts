@@ -66,14 +66,21 @@ function safeParseJson(value: string) {
   }
 }
 
-function getApiErrorMessage(payload: unknown) {
+/**
+ * Builds a one-line message from a Parix problem-details body: the detail, then which fields failed
+ * validation (`fieldErrors` / `errors`), the machine-readable `code`, and TigerBeetle `tbResults`.
+ */
+export function getApiErrorMessage(payload: unknown) {
   if (!payload || typeof payload !== 'object') {
     return null;
   }
 
   const row = payload as {
+    code?: unknown;
     detail?: unknown;
     error?: unknown;
+    errors?: unknown;
+    fieldErrors?: unknown;
     message?: unknown;
     title?: unknown;
     tbResults?: unknown;
@@ -91,6 +98,15 @@ function getApiErrorMessage(payload: unknown) {
     parts.push(row.title.trim());
   }
 
+  const validationIssues = [...formatFieldErrors(row.fieldErrors), ...stringItems(row.errors)];
+  if (validationIssues.length > 0) {
+    parts.push(validationIssues.join('; '));
+  }
+
+  if (typeof row.code === 'string' && row.code.trim().length > 0) {
+    parts.push(`code: ${row.code.trim()}`);
+  }
+
   if (Array.isArray(row.tbResults) && row.tbResults.length > 0) {
     parts.push(`tbResults: ${JSON.stringify(row.tbResults)}`);
   }
@@ -100,4 +116,24 @@ function getApiErrorMessage(payload: unknown) {
   }
 
   return parts.join(' — ');
+}
+
+function formatFieldErrors(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return [];
+  }
+
+  return Object.entries(value).flatMap(([field, messages]) => {
+    const items = stringItems(messages);
+    return items.length > 0 ? [`${field}: ${items.join(', ')}`] : [];
+  });
+}
+
+function stringItems(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    .map((item) => item.trim());
 }
