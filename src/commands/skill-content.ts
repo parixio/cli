@@ -31,7 +31,7 @@ export const PARIX_AGENT_SKILL = [
   '',
   'Database and TigerBeetle commands operate in the active organization from the current session. Stop if that organization or target environment is not the intended one.',
   '',
-  'Use `--json` when a database or TigerBeetle command needs the complete response, but do not assume it is directly pipeable to `jq`: current output is wrapped by Clack formatting.',
+  'Use `--json` when a database or TigerBeetle command needs the complete response. It prints plain JSON on stdout that can be piped to `jq`; on failure stdout stays empty, the error goes to stderr, and the exit code is non-zero. `parix api` has no `--json` flag and always prints a decorated status block.',
   '',
   '## Manage databases',
   '',

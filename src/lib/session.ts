@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 
@@ -46,9 +46,19 @@ export async function readStoredSession(): Promise<StoredSession | null> {
   }
 }
 
+const SESSION_DIRECTORY_MODE = 0o700;
+const SESSION_FILE_MODE = 0o600;
+
 export async function writeStoredSession(session: StoredSession) {
-  await mkdir(dirname(SESSION_FILE_PATH), { recursive: true });
-  await writeFile(SESSION_FILE_PATH, `${JSON.stringify(session, null, 2)}\n`, 'utf8');
+  const directory = dirname(SESSION_FILE_PATH);
+  await mkdir(directory, { recursive: true, mode: SESSION_DIRECTORY_MODE });
+  await chmod(directory, SESSION_DIRECTORY_MODE);
+  await writeFile(SESSION_FILE_PATH, `${JSON.stringify(session, null, 2)}\n`, {
+    encoding: 'utf8',
+    mode: SESSION_FILE_MODE,
+  });
+  // `mode` only applies on creation, so also tighten files written by older releases.
+  await chmod(SESSION_FILE_PATH, SESSION_FILE_MODE);
 }
 
 export async function clearStoredSession() {

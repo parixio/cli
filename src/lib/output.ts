@@ -1,7 +1,16 @@
 import { log } from '@clack/prompts';
+import process from 'node:process';
 
 export function printJson(value: unknown) {
+  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+export function printJsonBlock(value: unknown) {
   log.message(JSON.stringify(value, null, 2));
+}
+
+export function isJsonOutputRequested(argv: readonly string[] = process.argv) {
+  return argv.includes('--json');
 }
 
 export function printKeyValues(entries: Array<[string, string]>) {

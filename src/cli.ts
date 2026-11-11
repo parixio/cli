@@ -8,6 +8,7 @@ import { createAuthCommand } from './commands/auth';
 import { createDatabaseCommand } from './commands/database';
 import { createSkillCommand } from './commands/skill';
 import { createTbCommand } from './commands/tb';
+import { isJsonOutputRequested } from './lib/output';
 
 const loadPackageJson = createRequire(import.meta.url);
 const packageJson = loadPackageJson('../package.json') as { version: string };
@@ -29,14 +30,27 @@ async function main() {
   await program.parseAsync(process.argv);
 }
 
+// Pipe writes are asynchronous on macOS; drain them so `process.exit` cannot truncate output.
+function flushStdout() {
+  return new Promise<void>((resolve) => {
+    process.stdout.write('', () => resolve());
+  });
+}
+
 main()
-  .then(() => {
+  .then(async () => {
     // CLIs that open HTTP servers / use undici fetch can leave sockets that keep
     // Node alive after the command is done. Exit explicitly once work is finished.
+    await flushStdout();
     process.exit(process.exitCode ?? 0);
   })
-  .catch((error) => {
+  .catch(async (error) => {
     const message = error instanceof Error ? error.message : String(error);
-    log.error(message);
+    if (isJsonOutputRequested()) {
+      process.stderr.write(`Error: ${message}\n`);
+    } else {
+      log.error(message);
+    }
+    await flushStdout();
     process.exit(1);
   });

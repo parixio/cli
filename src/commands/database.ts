@@ -1,4 +1,4 @@
-import { confirm, isCancel, note, outro } from '@clack/prompts';
+import { confirm, isCancel, log, note, outro } from '@clack/prompts';
 import { Command } from 'commander';
 import { printJson, printKeyValues, printTable } from '../lib/output';
 import { requestApiJson } from '../lib/parix-api';
@@ -48,7 +48,6 @@ interface CreateCatalogResponse {
       priceMultiplier: number;
     }>;
   };
-  ok: true;
 }
 
 interface CreateResponse {
@@ -87,7 +86,6 @@ interface DatabaseListResponse {
     status: string;
     updatedAt: string;
   }>;
-  ok: true;
 }
 
 interface DatabaseInfoResponse {
@@ -105,12 +103,10 @@ interface DatabaseInfoResponse {
     updatedAt: string;
     workflowId: string | null;
   } | null;
-  gatewayUrl: string | null;
   latestProvisionJob: {
     completedAt: string | null;
     createdAt: string;
     error: string | null;
-    gatewayUrl: string;
     id: string;
     provider: string;
     region: string;
@@ -125,10 +121,10 @@ interface DatabaseInfoResponse {
     lastCollectedAt: string | null;
     memoryUsagePct: number | null;
   } | null;
-  ok: true;
   profile: {
+    architecture?: string | null;
+    clusterConfigId?: string | null;
     deploymentNetworkMode: string;
-    gatewayUrl: string | null;
     id: string;
     providerId: string;
     regionId: string;
@@ -142,12 +138,19 @@ interface DatabaseInfoResponse {
   } | null;
   provider: string | null;
   region: string | null;
+  storageHealth: {
+    diskUsagePct: number | null;
+    machineId: string;
+    observedAt: string;
+    status: 'ok' | 'warning' | 'critical' | 'full';
+    usagePct: number | null;
+    writesBlocked: boolean;
+  } | null;
 }
 
 interface RemoveResponse {
   databaseId: string;
   message: string;
-  ok: true;
   status: 'queued';
   workflowId: string;
 }
@@ -233,7 +236,7 @@ export function createDatabaseCommand() {
         '',
         'Examples:',
         '  parix database create payments-ledger --provider gcp --region asia-southeast1',
-        '  parix database create payments-ledger --provider aws --region ap-southeast-1 --cluster-config-id config-single --cluster-size-id size-hx-5',
+        '  parix database create payments-ledger --provider aws --region ap-southeast-1 --cluster-config-id config-single --cluster-size-id size-px-5',
       ].join('\n'),
     )
     .action(async (databaseName: string, options: CreateOptions) => {
@@ -380,15 +383,35 @@ export function createDatabaseCommand() {
         ['Database Name', response.database.name],
         ['Provider', response.provider ?? '-'],
         ['Region', response.region ?? '-'],
-        ['Gateway URL', response.gatewayUrl ?? '-'],
         ['Status', response.decommissionState?.status ?? response.profile?.status ?? '-'],
         ['Version', response.profile?.tigerbeetleCurrentVersion ?? response.profile?.tigerbeetleVersion ?? '-'],
+        ['Cluster config', response.profile?.clusterConfigId ?? '-'],
+        ['Architecture', response.profile?.architecture ?? '-'],
         ['Nodes', response.profile ? String(response.profile.selectedNodeCount) : '-'],
         ['CPU', response.profile ? String(response.profile.selectedVcpu) : '-'],
         ['Memory GB', response.profile ? String(response.profile.selectedMemoryGb) : '-'],
         ['Storage GB', response.profile?.selectedStorageGb != null ? String(response.profile.selectedStorageGb) : '-'],
+        ['Storage health', response.storageHealth?.status ?? '-'],
         ['Updated', response.database.updatedAt],
       ]);
+
+      if (response.storageHealth) {
+        note(
+          [
+            `Status: ${response.storageHealth.status}`,
+            `Storage used: ${formatPct(response.storageHealth.usagePct)}`,
+            `Data disk used: ${formatPct(response.storageHealth.diskUsagePct)}`,
+            `Writes blocked: ${response.storageHealth.writesBlocked ? 'yes' : 'no'}`,
+            `Observed: ${response.storageHealth.observedAt}`,
+          ].join('\n'),
+          'Storage health',
+        );
+        if (response.storageHealth.writesBlocked) {
+          log.warn(
+            'Writes are blocked: TigerBeetle writes to this database are rejected with HTTP 507 until storage is freed or increased.',
+          );
+        }
+      }
 
       if (response.metricsSummary) {
         note(
@@ -459,4 +482,8 @@ export function createDatabaseCommand() {
     });
 
   return database;
+}
+
+function formatPct(value: number | null) {
+  return value == null ? '-' : `${value}%`;
 }
