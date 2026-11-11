@@ -80,13 +80,12 @@ interface TbResponse {
   docsUrl: string;
   message: string;
   mode: string;
-  ok: true;
   operation: string;
   operationLabel: string;
   persisted: boolean;
   provider: string;
   replicaCount: number;
-  requestPayload: unknown;
+  requestPayload?: unknown;
   responsePayload: unknown;
   targetHost: string;
 }
